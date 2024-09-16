@@ -21,7 +21,7 @@ export const wordpressStore = defineStore({
             this.loading = true
             try {
                 const response = await axios
-                    .get('/api/wordpress')
+                    .get(`/api/wordpress`)
                     .then(response => {
                         this.wordpress = response.data
                     })
@@ -34,11 +34,11 @@ export const wordpressStore = defineStore({
         async addWordpress(form, setErrors, processing) {
             await csrf()
             processing.value = true
-            axios
-                .post('/api/wordpress', form)
+            // const url = import.meta.env.VITE_PUBLIC_BACKEND_URL
+               await axios.post(`/api/wordpress`, form)
                 .then(response => {
                     processing.value = false
-                    console.log(response)
+                    // console.log(response)
                     this.wordpress.push(response.data)
                     this.router.push({ name: 'admin.wordpress.index' })
                 })
@@ -52,26 +52,6 @@ export const wordpressStore = defineStore({
                     processing.value = false
                 })
         },
-        async productById(slug, id) {
-            this.loading = true
-            try {
-                const response = await axios.get(`/api/product/${slug}/${id}`)
-                if (response.status === 200) {
-                    this.singleData = response.data
-                } else {
-                    this.singleData = {}
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    this.singleData = {}
-                } else {
-                    this.error = error
-                }
-            } finally {
-                this.loading = false
-            }
-        },
-
         async editProduct(updateProduct, setErrors, processing, id) {
             await csrf()
             processing.value = true
@@ -91,19 +71,35 @@ export const wordpressStore = defineStore({
                     processing.value = false
                 })
         },
-        async deleteProduct(id, processing) {
-            await csrf()
+        async RemoveWp(id, setErrors, processing) {
+            // const url = import.meta.env.VITE_PUBLIC_BACKEND_URL
             processing.value = true
             try {
-                const response = await axios.delete(`/api/product/${id}`)
+                const response = await axios.delete(`/api/wordpress/${id}`)
                 console.log(response)
                 processing.value = false
+                this.wordpress = this.wordpress.filter(wordpress => wordpress.id !== id);
             } catch (error) {
                 this.error = error
                 console.log(this.error)
                 processing.value = false
             } finally {
                 processing.value = false
+            }
+        },
+        async getWordpressById(id) {
+            this.loading = true
+            try {
+                const response = await axios 
+                .get(`/api/wordpress/wordpress-by-id/${id}`)
+                .then(response => {
+                    this.wordpress = response.data
+                    
+                })
+            } catch (error) {
+                this.error = error
+            } finally {
+                this.loading = false
             }
         },
     },

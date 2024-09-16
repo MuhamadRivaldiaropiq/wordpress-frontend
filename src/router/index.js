@@ -15,16 +15,76 @@ const routes = [
         path: '/',
         name: 'welcome',
         redirect: '/dashboard',
+        meta: {
+            guard: 'auth',
+        },
     },
+    // user
+    {
+        path: '/user/wordpress',
+        name: 'user.wordpress.index',
+        component: () => import('@/pages/User/Wordpress/Index.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/user/article/:id',
+        name: 'user.article.index',
+        component: () => import('@/pages/User/Article/Index.vue'),
+        meta: {
+            guard: 'auth',
+        },
+        props: true
+    },
+    {
+        path: '/user/article/create/:id',
+        name: 'user.article.create',
+        component: () => import('@/pages/User/Article/Create.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/user/article/update/:id/:idwp',
+        name: 'user.article.update',
+        component: () => import('@/pages/User/Article/Update.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    // admin
     {
         path: '/admin/wordpress',
         name: 'admin.wordpress.index',
         component: () => import('@/pages/admin/wordpress/Index.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/admin/article',
+        name: 'admin.article.index',
+        component: () => import('@/pages/admin/article/Index.vue'),
+        meta: {
+            guard: 'auth',
+        },
     },
     {
         path: '/admin/wordpress/create',
         name: 'admin.wordpress.create',
         component: () => import('@/pages/admin/wordpress/Create.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/admin/article/create',
+        name: 'admin.article.create',
+        component: () => import('@/pages/admin/article/Create.vue'),
+        meta: {
+            guard: 'auth',
+        },
     },
     {
         path: '/home',
@@ -47,11 +107,29 @@ const routes = [
         },
     },
     {
-        path: '/admin/dashboard',
-        name: 'admin.dashboard',
-        component: () => import('@/pages/admin/Dashboard.vue'),
+        path: '/admin/user',
+        name: 'admin.user.index',
+        component: () => import('@/pages/admin/User/Index.vue'),
         meta: {
             title: 'Dashboard',
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/admin/user/create',
+        name: 'admin.user.create',
+        component: () => import('@/pages/admin/User/Create.vue'),
+        meta: {
+            title: 'Dashboard',
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/admin/user/update/:id',
+        name: 'admin.user.update',
+        component: () => import('@/pages/admin/User/Update.vue'),
+        meta: {
+            title: 'Users Update',
             guard: 'auth',
         },
     },
@@ -67,15 +145,15 @@ const routes = [
             guard: 'guest',
         },
     },
-    {
-        path: '/register',
-        name: 'register',
-        component: Register,
-        meta: {
-            title: 'Register',
-            guard: 'guest',
-        },
-    },
+    // {
+    //     path: '/register',
+    //     name: 'register',
+    //     component: Register,
+    //     meta: {
+    //         title: 'Register',
+    //         guard: 'guest',
+    //     },
+    // },
     {
         path: '/forgot-password',
         name: 'forgot-password',
@@ -140,6 +218,14 @@ router.beforeEach((to, from, next) => {
     else if (to.matched.some(route => route.meta.guard === 'auth') && !auth)
         next({ name: 'login' })
     else next()
+    // const level = localStorage.getItem('level');
+    // if (to.path === '/dashboard' && level !== 'admin') {
+    //     next('/dashboard');
+    // } else if (to.path === '/user/home' && level !== 'user') {
+    //     next('/admin/dashboard');
+    // } else {
+    //     next();
+    // }
 })
 
 // Page Title and Metadata

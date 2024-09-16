@@ -1,5 +1,6 @@
 <script setup>
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useUsers } from '@/stores/user'
 import { computed, ref } from 'vue'
 import PrimaryButton from '@/components/PrimaryButton.vue'
@@ -8,8 +9,10 @@ import GuestLayout from '@/layouts/GuestLayout.vue'
 import TextInput from '@/components/TextInput.vue'
 import InputLabel from '@/components/InputLabel.vue'
 import ValidationErrors from '@/components/ValidationErrors.vue'
+import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter()
 
 const store = useUsers()
 
@@ -27,8 +30,13 @@ const errors = computed(() => setErrors.value)
 
 const status = route.query.reset?.length > 0 ? atob(route.query.reset) : null
 
-const submitLogin = () => {
+const submitLogin = async () => {
     store.login(form, setErrors, processing)
+    // await axios.post('http://localhost:8000/api/login', {
+    //     email: form.value.email,
+    //     password: form.value.password
+    // });
+    // router.push({ name: 'dashboard'})
 }
 </script>
 
@@ -47,7 +55,7 @@ const submitLogin = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full text-typography-3"
                     required
                     autofocus
                     autocomplete="username" />
@@ -59,7 +67,7 @@ const submitLogin = () => {
                     id="password"
                     v-model="form.password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full text-typography-3"
                     required
                     autocomplete="current-password" />
             </div>

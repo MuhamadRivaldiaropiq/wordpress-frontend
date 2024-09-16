@@ -60,7 +60,7 @@ provide('rail', rail)
                                     class="rounded-full h-10 border w-10 object-cover"
                                     alt="" />
                                 <p class="text-sm dark:text-typography-2">
-                                    {{ store.userData.name }}
+                                    {{ store.userData.username }}
                                 </p>
                             </div>
                         </div>
