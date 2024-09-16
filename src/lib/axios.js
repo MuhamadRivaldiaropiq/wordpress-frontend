@@ -8,5 +8,26 @@ const axios = Axios.create({
     withCredentials: true,
     withXSRFToken: true
 })
-
+axios.interceptors.response.use(
+    response => response,
+    async error => {
+        if (error.response.status === 419 || error.response.status === 401) {
+            localStorage.removeItem('userData')
+            localStorage.removeItem('authStatus')
+            window.location.reload()
+        }
+        return Promise.reject(error)
+    },
+)
+// axios.interceptors.response.use(
+//     response => response,
+//     async error => {
+//         if (error.response.status === 419 || error.response.status === 403) {
+//             localStorage.removeItem('userData')
+//             localStorage.removeItem('authStatus')
+//             window.location.reload()
+//         }
+//         return Promise.reject(error)
+//     },
+// )
 export default axios

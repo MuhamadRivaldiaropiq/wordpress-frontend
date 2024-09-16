@@ -12,7 +12,8 @@ export const useUsers = defineStore('users', {
 
     getters: {
         authUser: state => state.authStatus === 204,
-        hasUserData: state => Object.keys(state.userData).length > 0,
+        hasUserData: state => Object.keys(state.userData).length < 0,
+        // levelUser: state => Object.keys(state.level),
         hasVerified: state =>
             Object.keys(state.userData).length > 0
                 ? state.userData.email_verified_at !== null
@@ -22,9 +23,10 @@ export const useUsers = defineStore('users', {
     actions: {
         getData() {
             axios
-                .get('/api/user')
+                .get(`/api/user`)
                 .then(response => {
                     this.userData = response.data
+                    
                 })
                 .catch(error => {
                     if (error.response.status !== 409) throw error
@@ -60,9 +62,8 @@ export const useUsers = defineStore('users', {
             await csrf()
 
             processing.value = true
-
             axios
-                .post('/login', form.value)
+                .post(`/login`, form.value)
                 .then(response => {
                     this.authStatus = response.status
                     processing.value = false
@@ -125,7 +126,6 @@ export const useUsers = defineStore('users', {
 
         resendEmailVerification(setStatus, processing) {
             processing.value = true
-
             axios.post('/email/verification-notification').then(response => {
                 setStatus.value = response.data.status
                 processing.value = false
@@ -133,18 +133,30 @@ export const useUsers = defineStore('users', {
         },
 
         async logout() {
+            const url = import.meta.env.VITE_PUBLIC_BACKEND_URL
             await axios
-                .post('/logout')
+                .post(`${url}/logout`)
                 .then(() => {
                     this.$reset()
                     this.userData = {}
                     this.authStatus = []
 
-                    this.router.push({ name: 'welcome' })
+                    this.router.push({ name: 'login' })
                 })
                 .catch(error => {
                     if (error.response.status !== 422) throw error
                 })
+//             axios.interceptors.response.use(
+//     response => response,
+//     async error => {
+//         if (error.response.status === 419 || error.response.status === 401) {
+//             localStorage.removeItem('userData')
+//             localStorage.removeItem('authStatus')
+//             window.location.reload()
+//         }
+//         return Promise.reject(error)
+//     },
+// )
         },
     },
 })
