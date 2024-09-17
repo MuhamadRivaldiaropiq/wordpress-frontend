@@ -1,5 +1,5 @@
 <script setup>
-import DialogImage from '@/components/DialogImage.vue'
+import DialogImage from '@/components/Form_Article/DialogImage.vue'
 import { ref, defineEmits } from 'vue'
 const DialogOpen = ref(false)
 const SelectedMedia = ref('')

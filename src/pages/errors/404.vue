@@ -73,4 +73,7 @@ const auth = store.authUser
             </div>
         </div>
     </div>
+    <!-- <div class="h-screen overflow-hidden">
+        <img src="/images/erorr_404.jpg" alt="" class="w-full h-full">
+    </div> -->
 </template>

@@ -9,8 +9,8 @@ import LoadingOverlay from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
-import DialogImage from '@/components/DialogImage.vue'
-import FeaturedMedia from '@/components/FeaturedMedia.vue'
+import DialogImage from '@/components/Form_Article/DialogImage.vue'
+import FeaturedMedia from '@/components/Form_Article/FeaturedMedia.vue'
 import Tags from '@/components/Form_Article/Tags.vue'
 import Category from '@/components/Form_Article/Category.vue'
 import PublishArticle from '@/components/Form_Article/PublishArticle.vue'
@@ -131,6 +131,7 @@ const SendTags = Tags => {
 const SendCategory = Category => {
     FormArticle.value.Categorys = Category
 }
+
 const handleFormSubmit = ({ status, date }) => {
     FormArticle.value.Date = date
     console.log(FormArticle.value.Date)

@@ -23,8 +23,7 @@ export const useArticleStore = defineStore({
         getError: state => state.error,
     },
     actions: {
-        async getArticleByDomain(wordpress) {
-            // console.log(wordpress.token);
+        async getArticleByDomain(wordpress, totalPages, total) {
             this.loading = true
             try {
                 const response = await axiosWp
@@ -35,31 +34,36 @@ export const useArticleStore = defineStore({
                         },
                     })
                     .then(response => {
+                        totalPages.value =
+                            response.headers.get('X-WP-TotalPages')
+                        total.value = response.headers.get('X-WP-Total')
+
                         this.articles = response.data
                     })
             } catch (error) {
+                console.log(error)
+
                 if (error.response.data.message == 'Expired token') {
                     this.refreshToken(wordpress)
-                    console.log(error.response.data.data.status);
-                    
+                    console.log(error.response.data.data.status)
                 }
                 this.error = error
             } finally {
                 this.loading = false
             }
         },
-        async refreshToken(wordpress){
+        async refreshToken(wordpress) {
             // const tokenStore = useToken()
             try {
                 const response = await axiosWp.post(
                     `${wordpress.domain}/wp-json/jwt-auth/v1/token`,
                     {
                         username: wordpress.username,
-                        password: ('42VWNJ&**d$XR5tAyi'),
+                        password: '42VWNJ&**d$XR5tAyi',
                     },
                 )
                 // processing.value = false
-                console.log('token sucses');
+                console.log('token sucses')
                 this.tokens = response.data
                 // console.log(this.tokens);
                 this.UpdateTokenWordpress(wordpress)
@@ -81,7 +85,6 @@ export const useArticleStore = defineStore({
                 }
                 // processing.value = false
                 // console.log(Media);
-                
             }
         },
         async UpdateTokenWordpress(wordpress) {
@@ -90,18 +93,18 @@ export const useArticleStore = defineStore({
             formData.append('_method', 'PUT')
             formData.append('token', this.tokens.token)
             // console.log(this.tokens.token);
-            
-            axios.post(`/api/wordpress/${wordpress.id}`, formData)
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                if(error.response.status !== 422) throw error
-                setErrors.value = Object.values(
-                    error.response.data.errors,
-                ).flat()
-            })
 
+            axios
+                .post(`/api/wordpress/${wordpress.id}`, formData)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    if (error.response.status !== 422) throw error
+                    setErrors.value = Object.values(
+                        error.response.data.errors,
+                    ).flat()
+                })
         },
         async PublishArticles(form, setErrors, processing, domain, token) {
             processing.value = true
