@@ -28,16 +28,18 @@ provide('rail', rail)
     <v-app
         class="!bg-light-primary-2 dark:!bg-dark-primary-1 font-inter !transition-colors !duration-500"
         :class="isDark ? 'dark' : ''">
-        <Navigation />
-        <v-main>
-            <v-container class="!py-0 !max-w-none">
-                <div class="py-5 px-10">
+        <div class="hidden !w-0 md:block">
+            <Navigation />
+        </div>
+        <v-main class="!pl-0 md:!pl-16">
+            <v-container class="!p-0 !max-w-none">
+                <div class="py-5 px-5">
                     <div class="w-full flex justify-between items-center mb-5">
                         <p
                             class="text-2xl font-bold dark:font-medium text-ezzora-900 dark:text-white">
                             {{ title }}
                         </p>
-                        <div class="flex gap-10 items-center">
+                        <div class="gap-10 items-center hidden md:flex">
                             <div class="flex justify-center gap-2 items-center">
                                 <i
                                     class="fa-light fa-sun-bright text-gray-900 dark:text-gray-600"></i>

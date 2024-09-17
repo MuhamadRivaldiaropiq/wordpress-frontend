@@ -2,5 +2,5 @@
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 </script>
 <template>
-    <AuthenticatedLayout>s</AuthenticatedLayout>
+    <AuthenticatedLayout></AuthenticatedLayout>
 </template>
