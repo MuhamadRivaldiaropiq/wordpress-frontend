@@ -29,13 +29,16 @@ const wordpress = ref([])
 const searchQuery = ref([])
 const dropdownIndex = ref(null)
 const route = useRoute()
+const pageProduct = ref(0)
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+const totalItems = ref(0)
 const id = computed(() => route.params.id)
 
 onBeforeMount(async () => {
     await stores.getWordpressById(id.value)
     const { domain, token } = wordpress.value
-    await store.getArticleByDomain(wordpress.value)
-
+    await store.getArticleByDomain(wordpress.value, pageProduct, totalItems)
     isloading.value = false
     fetchData()
 })
@@ -48,6 +51,13 @@ const fetchData = async () => {
     articles.value = store.articles
     wordpress.value = stores.wordpress
 }
+
+const changePage = (page) => {
+    currentPage.value = page
+    fetchData()
+}
+
+
 const submitArticle = async item => {
     const formData = new FormData()
     formData.append('status', 'publish')
@@ -60,7 +70,7 @@ const submitArticle = async item => {
         token,
         item.id,
     )
-    ;(processing.value = false), fetchData()
+        ; (processing.value = false), fetchData()
 }
 watchEffect(() => {
     fetchData()
@@ -134,19 +144,9 @@ const getstatusClass = status => {
         }
     }
 }
-const toggleDropdown = item => {
-    dropdownIndex.value = dropdownIndex.value === item ? null : item
-}
-const closeDropdown = () => {
-    dropdownIndex.value = null
-}
 
-onMounted(() => {
-    document.addEventListener('click', closeDropdown)
-})
-onBeforeUnmount(() => {
-    document.removeEventListener('click', closeDropdown)
-})
+
+
 const previewItem = item => {
     const url = item.guid.rendered
     if (url) {
@@ -190,25 +190,20 @@ const selectedItem = ref([])
 <template>
     <loading-overlay :active="isloading" loader="dots" color="#06D001" />
     <AuthenticatedLayout title="Article">
+        {{ totalItems }}
         <div v-if="!isloading">
             <div>
-                <div
-                    class="bg-typography-1 dark:bg-dark-primary-2 p-4 px-10 rounded-tl-lg inline-flex items-center gap-3 justify-center"
+                <div class="bg-typography-1 dark:bg-dark-primary-2 p-4 px-10 rounded-tl-lg inline-flex items-center gap-3 justify-center"
                     style="border-radius: 20px 150px 0px 0px">
                     <i class="fa-solid fa-bars-staggered text-secondary-3"></i>
-                    <div
-                        class="font-bold text-secondary-3 flex items-center gap-3">
+                    <div class="font-bold text-secondary-3 flex items-center gap-3">
                         {{ wordpress.domain }}
                     </div>
                     <div>
                         <div>
-                            <svg
-                                v-if="processing"
-                                role="status"
+                            <svg v-if="processing" role="status"
                                 class="inline mr-4 ml-4 w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-secondary-3"
-                                viewBox="0 0 100 101"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
+                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
                                     fill="currentColor" />
@@ -219,92 +214,65 @@ const selectedItem = ref([])
                         </div>
                     </div>
                 </div>
-                <div
-                    class="bg-typography-1 dark:bg-dark-primary-2 rounded-tr-lg">
-                    <div
-                        class="flex md:flex-row flex-col-reverse justify-between rounded-tl-lg">
+                <div class="bg-typography-1 dark:bg-dark-primary-2 rounded-tr-lg">
+                    <div class="flex md:flex-row flex-col-reverse justify-between rounded-tl-lg">
                         <div class="p-6 pb-0 relative">
-                            <input
-                                type="search"
-                                placeholder="search..."
-                                v-model="searchQuery"
+                            <input type="search" placeholder="search..." v-model="searchQuery"
                                 class="h-8 md:w-56 w-full px-8 rounded-lg" />
-                            <i
-                                class="fa-solid fa-filter absolute top-9 left-9 -translate-y-1 text-gray-500"></i>
+                            <i class="fa-solid fa-filter absolute top-9 left-9 -translate-y-1 text-gray-500"></i>
                         </div>
                         <div>
                             <div class="px-6 pt-6">
-                                <RouterLink
-                                    :to="{
-                                        name: 'user.article.create',
-                                        params: { id: id },
-                                    }"
+                                <RouterLink :to="{
+                                    name: 'user.article.create',
+                                    params: { id: id },
+                                }"
                                     class="bg-secondary-3 px-3 py-2 rounded-lg text-typography-1 hover:bg-opacity-90 border shadow-lg">
                                     + Add Article
                                 </RouterLink>
                             </div>
                         </div>
                     </div>
-                    <v-data-table
-                        :items="articles"
-                        :headers="header"
-                        :search="searchQuery"
+                    <v-data-table :items="articles" :headers="header" :search="searchQuery" hide-default-footer="true"
+                        items-per-page="10"
                         class="!p-2 dark:!bg-dark-primary-2 dark-mode dark:!text-typography-1 !rounded-none">
                         <template v-slot:[`header.id`]="{ column }">
-                            <v-icon class="mr-2"
-                                ><i
-                                    class="fa-solid fa-square-check text-secondary-3"></i
-                            ></v-icon>
+                            <v-icon class="mr-2"><i class="fa-solid fa-square-check text-secondary-3"></i></v-icon>
                             {{ column.text }}
                         </template>
                         <template v-slot:[`item.id`]="{ item }">
-                            <input
-                                type="checkbox"
-                                :value="item"
-                                v-model="selectedItem"
+                            <input type="checkbox" :value="item" v-model="selectedItem"
                                 :disabled="item.status == 'publish'" />
                         </template>
                         <template v-slot:[`item.status`]="{ item }">
-                            <span
-                                :class="getstatusClass(item.status).container">
-                                <span
-                                    :class="
-                                        getstatusClass(item.status).circle
+                            <span :class="getstatusClass(item.status).container">
+                                <span :class="getstatusClass(item.status).circle
                                     "></span>
                                 {{ item.status }}
                             </span>
                         </template>
                         <template v-slot:[`item.action`]="{ item }">
                             <div class="flex justify-center">
-                                <button
-                                    @click.stop="toggleDropdown(item)"
-                                    class="text-gray-500 hover:text-gray-700">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 mx-auto"
-                                        viewBox="0 0 20 20"
+                                <button @click.stop="toggleDropdown(item)" class="text-gray-500 hover:text-gray-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path
                                             d="M6 10a2 2 0 110-4 2 2 0 010 4zM10 10a2 2 0 110-4 2 2 0 010 4zM14 10a2 2 0 110-4 2 2 0 010 4z" />
                                     </svg>
                                 </button>
-                                <div
-                                    v-if="dropdownIndex === item"
+                                <div v-if="dropdownIndex === item"
                                     class="absolute right-0 mt-2 w-32 bg-typography-1 border border-gray-300">
                                     <ul
                                         class="text-left p-2 cursor-pointer dark:bg-dark-primary-2 dark:text-typography-1 py-3">
-                                        <li
-                                            @click="Update(item)"
+                                        <li @click="Update(item)"
                                             class="hover:bg-gray-100 dark:hover:bg-dark-primary-1 p-0.5">
                                             Update
                                         </li>
-                                        <li
-                                            @click="previewItem(item)"
+                                        <li @click="previewItem(item)"
                                             class="hover:bg-gray-100 dark:hover:bg-dark-primary-1 p-0.5">
                                             Preview
                                         </li>
-                                        <li
-                                            @click="Remove(item.id)"
+                                        <li @click="Remove(item.id)"
                                             class="hover:bg-gray-100 dark:hover:bg-dark-primary-1 p-0.5">
                                             Remove
                                         </li>
@@ -313,6 +281,10 @@ const selectedItem = ref([])
                             </div>
                         </template>
                     </v-data-table>
+                    <v-pagination
+                        class="bg-light-primary-2 border !border-typography-2/20 shadow-lg rounded-lg dark:bg-dark-primary-1 dark:text-white"
+                        :total-visible="5" :current-page="1" :total-items="totalItems"
+                        @update:currentPage="changePage"></v-pagination>
                 </div>
             </div>
         </div>
@@ -334,6 +306,7 @@ const selectedItem = ref([])
 .v-data-table thead {
     background-color: #ebffef;
 }
+
 .dark-mode .v-data-table thead {
     background-color: black;
 }
