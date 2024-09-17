@@ -9,8 +9,8 @@ import LoadingOverlay from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
-import DialogImage from '@/components/DialogImage.vue'
-import FeaturedMedia from '@/components/FeaturedMedia.vue'
+import DialogImage from '@/components/Form_Article/DialogImage.vue'
+import FeaturedMedia from '@/components/Form_Article/FeaturedMedia.vue'
 import Tags from '@/components/Form_Article/Tags.vue'
 import Category from '@/components/Form_Article/Category.vue'
 import PublishArticle from '@/components/Form_Article/PublishArticle.vue'
@@ -19,9 +19,9 @@ import Dialog from 'primevue/dialog';
 
 const toast = useToast();
 const route = useRoute()
-const store = useArticleStore();
 const stores = wordpressStore();
-
+const router = useRouter()
+const storeArticle = useArticleStore()
 const FormArticle = ref({
     Title: '',
     Content: '',
@@ -33,54 +33,20 @@ const FormArticle = ref({
 })
 const wordpress = ref([])
 const isloading = ref(true)
-// const isDropdownStatus = ref(false)
-// const isDropdownJadwal = ref(false)
-// const SelectedStatus = ref('')
-// const DateArticle = ref('')
 const quillEditor = ref(null)
 const Dialog1open = ref(false)
 const Dialog2open = ref(false)
-const IsoDate = computed(() => {
-    if (!DateArticle.value) return new Date().toISOString();
-    const localDate = new Date(DateArticle.value)
-    const utcDate = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
-    return utcDate.toISOString();
-})
-
-
-// const IsoDateDraft = computed(() => {
-//     const localDate = new Date(DateArticle.value)
-//     const utcDate = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
-//     return utcDate.toISOString();
-// })
-
-
-const id = computed(() => route.params.id)
-
-onBeforeMount(async () => {
-
-    await stores.getWordpressById(id.value)
-    const { domain } = stores.wordpress
-    // console.log(domain);
-
-    wordpress.value = stores.wordpress
-    // await store.getTagsbyDomain(domain)
-    // tags.value = store.Tags
-    // await store.getCategoryByDomain(domain)
-    // Categorys.value = store.Category
-    // await store.getMediaByDomain(domain)
-    // fetchMedia()
-    isloading.value = false
-});
-
-const router = useRouter()
-const storeArticle = useArticleStore()
-// const title = ref('')
-// const content = ref('')
 const processing = ref(false)
 const processings = ref(false)
 const setErrors = ref([])
 const errors = computed(() => setErrors.value)
+const id = computed(() => route.params.id)
+
+onBeforeMount(async () => {
+    await stores.getWordpressById(id.value)
+    wordpress.value = stores.wordpress
+    isloading.value = false
+});
 
 const AddArticle = async (status) => {
     const formData = new FormData()
@@ -115,12 +81,6 @@ const AddArticle = async (status) => {
 
 }
 
-
-
-
-const closemedia = () => {
-    isMedia.value = false
-}
 const OpenDialog = async (dialogNumber) => {
   if (dialogNumber === 1) {
     Dialog1open.value = true;
@@ -133,22 +93,24 @@ const SendMedia = (media) => {
     FormArticle.value.Featured_media = media.id
 //   console.log("Media yang dipilih:", media); 
 };
+
 const SendTags = (Tags) => {
     FormArticle.value.Tags = Tags
-}
+};
+
 const SendCategory = (Category) => {
     FormArticle.value.Categorys = Category
 }
+
 const handleFormSubmit = ({ status, date }) => {
-  FormArticle.value.Date = date // Atur tanggal terbit sesuai input
+  FormArticle.value.Date = date 
   console.log(FormArticle.value.Date);
-  
-  AddArticle(status); // Panggil fungsi AddArticle dengan status yang dipilih
+  AddArticle(status); 
 };
 
 const handleSaveDraft = ({status, date}) => {
-  FormArticle.value.Date = date // Atur tanggal terbit sesuai input
-  AddArticle(status); // Panggil fungsi AddArticle untuk menyimpan sebagai draf
+  FormArticle.value.Date = date 
+  AddArticle(status); 
 };
 </script>
 
@@ -160,7 +122,7 @@ const handleSaveDraft = ({status, date}) => {
                 <div class="flex gap-5">
                     <div class="w-[47rem]">
                         <v-card>
-                            {{ FormArticle.Featured_media  }}
+                            <!-- {{ FormArticle.Featured_media  }} -->
                             <div class="flex justify-end">
                                 <svg v-if="processing" role="status"
                                     class="inline mr-4 mt-4 w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-secondary-3"
@@ -184,7 +146,6 @@ const handleSaveDraft = ({status, date}) => {
                                         class="fa-solid fa-photo-film text-secondary-3 mr-1"></i>Tambahkan
                                     Media</button>
                                     <DialogImage v-model:visible="Dialog1open"/>
-                                    <!-- {{ Dialog1open }} -->
                                 <div id="quill-editor">
                                     <QuillEditor v-model:content="FormArticle.Content" ref="quillEditor" toolbar="full"
                                         contentType="html"
@@ -197,7 +158,7 @@ const handleSaveDraft = ({status, date}) => {
                     <div class="w-[20rem]">
                        <Tags @SelectedTags="SendTags"/>
                         <Category @SelectedCategorys="SendCategory"/>
-                        <featuredMedia @selectedMedia="SendMedia"/>
+                        <FeaturedMedia @selectedMedia="SendMedia"/>
                       <PublishArticle @submitForm="handleFormSubmit" @saveDraft="handleSaveDraft" />
                     </div>
                 </div>
