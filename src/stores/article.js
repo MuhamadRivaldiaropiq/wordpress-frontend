@@ -23,27 +23,47 @@ export const useArticleStore = defineStore({
         getError: state => state.error,
     },
     actions: {
-        async getArticleByDomain(wordpress, totalPages, total) {
+        async getArticleByDomain(wordpress) {
             this.loading = true
             try {
-                const response = await axiosWp
-                    .get(`${wordpress.domain}/wp-json/wp/v2/posts`, {
-                        params: { status: 'any' },
-                        headers: {
-                            Authorization: `Bearer ${wordpress.token}`,
-                        },
-                    })
-                    .then(response => {
-                        totalPages.value =
-                            response.headers.get('X-WP-TotalPages')
-                        total.value = response.headers.get('X-WP-Total')
+                const allArticles = []
+                let page = 1
+                const perPage = 100
+                let totalPages = 1
 
-                        this.articles = response.data
-                    })
+                while (page <= totalPages) {
+                    const response = await axiosWp.get(
+                        `${wordpress.domain}/wp-json/wp/v2/posts`,
+                        {
+                            params: {
+                                status: 'any',
+                                per_page: perPage,
+                                page: page,
+                            },
+                            headers: {
+                                Authorization: `Bearer ${wordpress.token}`,
+                            },
+                        },
+                    )
+
+                    allArticles.push(...response.data)
+
+                    totalPages = parseInt(
+                        response.headers['x-wp-totalpages'],
+                        10,
+                    )
+                    page++
+                }
+
+                this.articles = allArticles
             } catch (error) {
                 console.log(error)
 
-                if (error.response.data.message == 'Expired token') {
+                if (
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.message === 'Expired token'
+                ) {
                     this.refreshToken(wordpress)
                     console.log(error.response.data.data.status)
                 }
@@ -305,7 +325,7 @@ export const useArticleStore = defineStore({
                 this.loading = false
             }
         },
-        async RemoveArticle(id, domain, token, setErrors, processing) {
+        async RemoveArticle(id, domain, token, processing) {
             this.loading = true
             processing.value = true
             await axiosWp

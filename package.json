@@ -29,6 +29,7 @@
         "vuetify": "^3.6.13"
     },
     "devDependencies": {
+        "@mdi/font": "^7.4.47",
         "@primevue/nuxt-module": "^4.0.5",
         "@tailwindcss/forms": "^0.5.3",
         "@vitejs/plugin-vue": "^4.1.0",
