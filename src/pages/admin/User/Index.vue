@@ -88,15 +88,10 @@ watchEffect(() => {
 })
 </script>
 <template>
-    <loading-overlay
-        :active="isloading"
-        :is-full-page="true"
-        loader="dots"
-        color="#06D001" />
+    <loading-overlay :active="isloading" :is-full-page="true" loader="dots" color="#06D001" />
     <AuthenticatedLayout title="Users">
         <div v-if="!isloading">
-            <div
-                class="bg-typography-1 dark:bg-dark-primary-2 p-4 px-10 rounded-tl-lg inline-flex items-center gap-3 justify-center"
+            <div class="bg-typography-1 dark:bg-dark-primary-2 p-4 px-10 rounded-tl-lg inline-flex items-center gap-3 justify-center"
                 style="border-radius: 20px 150px 0px 0px">
                 <i class="fa-solid fa-bars-staggered text-secondary-3"></i>
                 <div class="font-bold text-secondary-3 flex items-center gap-3">
@@ -104,19 +99,14 @@ watchEffect(() => {
                 </div>
             </div>
             <div class="bg-typography-1 dark:bg-dark-primary-2 rounded-tr-lg">
-                <div class="flex flex-col-reverse md:flex-row justify-between">
+                <div class="flex py-6 items-center flex-col-reverse md:flex-row justify-between">
                     <div class="p-6 pb-0 relative">
-                        <input
-                            type="search"
-                            placeholder="search..."
-                            v-model="searchQuery"
+                        <input type="search" placeholder="search..." v-model="searchQuery"
                             class="h-8 md:w-56 w-full px-8 rounded-lg" />
-                        <i
-                            class="fa-solid fa-filter absolute top-9 left-9 -translate-y-1 text-gray-500"></i>
+                        <i class="fa-solid fa-filter absolute top-9 left-9 -translate-y-1 text-gray-500"></i>
                     </div>
                     <div class="px-6 pt-6">
-                        <RouterLink
-                            :to="{ name: 'admin.user.create' }"
+                        <RouterLink :to="{ name: 'admin.user.create' }"
                             class="bg-secondary-3 px-3 py-2 rounded-lg text-typography-1 hover:bg-opacity-90 border shadow-lg">
                             + Add Users
                         </RouterLink>
@@ -125,24 +115,18 @@ watchEffect(() => {
                 <v-data-table :items="user" :headers="header" class="px-6">
                     <template v-slot:[`item.level`]="{ item }">
                         <span :class="getRoleClass(item.level).container">
-                            <span
-                                :class="getRoleClass(item.level).circle"></span>
+                            <span :class="getRoleClass(item.level).circle"></span>
                             {{ item.level }}
                         </span>
                     </template>
                     <template v-slot:[`item.action`]="{ item }">
                         <div class="flex gap-3 !text-xs">
-                            <button
-                                @click="UpdateUsers(item.id)"
+                            <button @click="UpdateUsers(item.id)"
                                 class="flex gap-2 items-center text-white bg-secondary-3 hover:bg-opacity-90 rounded-lg px-3 py-1">
                                 <i class="fa-solid fa-pen"></i>
                                 <p>Edit</p>
                             </button>
-                            <ConfirmDelete
-                                v-if="item.level !== 'admin'"
-                                :label="'Delete'"
-                                :type="'User'"
-                                :id="item.id"
+                            <ConfirmDelete v-if="item.level !== 'admin'" :label="'Delete'" :type="'User'" :id="item.id"
                                 :method="RemoveUsers"></ConfirmDelete>
                         </div>
                     </template>

@@ -21,22 +21,64 @@ const routes = [
     },
     // user
     {
-        path: '/user/wordpress',
-        name: 'user.wordpress.index',
+        path: '/wordpress',
+        name: 'wordpress',
         component: () => import('@/pages/User/Wordpress/Index.vue'),
         meta: {
             guard: 'auth',
         },
     },
+    // {
+    //     path: '/user/article/:id',
+    //     name: 'user.article.index',
+    //     component: () => import('@/pages/User/Article/Index.vue'),
+    //     meta: {
+    //         guard: 'auth',
+    //     },
+    //     props: true,
+    // },
+    // Wp
     {
-        path: '/user/article/:id',
-        name: 'user.article.index',
+        path: '/wordpress/:id',
+        name: 'wordpresss',
+        component: () => import('@/pages/User/Article/DashboardWp.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/wordpress/:id/article',
+        name: 'wordpresss.article',
         component: () => import('@/pages/User/Article/Index.vue'),
         meta: {
             guard: 'auth',
         },
-        props: true
     },
+    {
+        path: '/wordpress/tags/:id',
+        name: 'wordpresss.tags',
+        component: () => import('@/pages/User/Article/Tags.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/wordpress/categorys/:id',
+        name: 'wordpresss.categorys',
+        component: () => import('@/pages/User/Article/Category.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/wordpress/media/:id',
+        name: 'wordpresss.media',
+        component: () => import('@/pages/User/Article/Media.vue'),
+        meta: {
+            guard: 'auth',
+        },
+    },
+    // end wp
     {
         path: '/user/article/create/:id',
         name: 'user.article.create',
@@ -54,22 +96,22 @@ const routes = [
         },
     },
     // admin
-    {
-        path: '/admin/wordpress',
-        name: 'admin.wordpress.index',
-        component: () => import('@/pages/admin/wordpress/Index.vue'),
-        meta: {
-            guard: 'auth',
-        },
-    },
-    {
-        path: '/admin/article',
-        name: 'admin.article.index',
-        component: () => import('@/pages/admin/article/Index.vue'),
-        meta: {
-            guard: 'auth',
-        },
-    },
+    // {
+    //     path: '/admin/wordpress',
+    //     name: 'admin.wordpress.index',
+    //     component: () => import('@/pages/User/wordpress/Index.vue'),
+    //     meta: {
+    //         guard: 'auth',
+    //     },
+    // },
+    // {
+    //     path: '/admin/article',
+    //     name: 'admin.article.index',
+    //     component: () => import('@/pages/admin/article/Index.vue'),
+    //     meta: {
+    //         guard: 'auth',
+    //     },
+    // },
     {
         path: '/admin/wordpress/create',
         name: 'admin.wordpress.create',
@@ -78,14 +120,14 @@ const routes = [
             guard: 'auth',
         },
     },
-    {
-        path: '/admin/article/create',
-        name: 'admin.article.create',
-        component: () => import('@/pages/admin/article/Create.vue'),
-        meta: {
-            guard: 'auth',
-        },
-    },
+    // {
+    //     path: '/admin/article/create',
+    //     name: 'admin.article.create',
+    //     component: () => import('@/pages/admin/article/Create.vue'),
+    //     meta: {
+    //         guard: 'auth',
+    //     },
+    // },
     {
         path: '/home',
         redirect: '/dashboard',
